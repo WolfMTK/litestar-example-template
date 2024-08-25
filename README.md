@@ -20,8 +20,8 @@ export DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/task
 
 ## Apply migrations
 
-alembic upgrade head
+`alembic upgrade head`
 
 ## Run
 
-uvicorn --factory app.main:create_app
+`uvicorn --factory app.main:create_app`
