@@ -2,9 +2,7 @@ from litestar import Litestar
 from litestar.di import Provide
 from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import SwaggerRenderPlugin, RedocRenderPlugin
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.adapter.db.gateway.task import TaskGateway
 from app.adapter.persistence.db import create_async_session_maker
 from app.config import load_config, ApplicationConfig
 from app.ioc import IoC
@@ -44,17 +42,11 @@ def _init_openapi_config() -> OpenAPIConfig:
     return config
 
 
-def get_transaction(session: AsyncSession) -> AsyncSession:
-    return session
-
-
 def _init_dependencies(config: ApplicationConfig) -> dict[str, Provide]:
     db_config = config.db
 
     dependencies = {
         "session": Provide(create_async_session_maker(db_config.db_url)),
-        "task_gateway": Provide(TaskGateway, sync_to_thread=True),
         "ioc": Provide(IoC, sync_to_thread=True),
-        "transaction": Provide(get_transaction, sync_to_thread=True)
     }
     return dependencies
