@@ -6,9 +6,11 @@ A small template for creating services using Litestar, which should help you in 
 know that not everything is done perfectly here, so I’m looking forward to your issues and suggestions on what could be
 improved.
 
-## [Creation of virtual environments](https://docs.python.org/3/library/venv.html)
+## Creation of virtual environments
 
 `python -m venv .venv`
+
+[More Detail](https://docs.python.org/3/library/venv.html)
 
 ## Install
 
