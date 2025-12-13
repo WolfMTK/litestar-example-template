@@ -16,13 +16,9 @@ improved.
 
 `pip install -e .`
 
-## Configure env:
+## Environment variables
 
-```
-export DEBUG=false
-
-export DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/task
-```
+`BASE_CONFIG` - path to the config
 
 ## Apply migrations
 
