@@ -46,7 +46,7 @@ def _init_dependencies(config: ApplicationConfig) -> dict[str, Provide]:
     db_config = config.db
 
     dependencies = {
-        "session": Provide(create_async_session_maker(db_config.db_url)),
+        "session": Provide(create_async_session_maker(db_config.url)),
         "ioc": Provide(IoC, sync_to_thread=True),
     }
     return dependencies

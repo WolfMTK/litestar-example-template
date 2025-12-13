@@ -1,12 +1,14 @@
 import os
+import tomllib
 from dataclasses import dataclass
+from typing import Any
 
 from app.exceptions import ConfigParseError
 
 
 @dataclass
 class DatabaseConfig:
-    db_url: str
+    url: str
 
 
 @dataclass
@@ -15,19 +17,21 @@ class ApplicationConfig:
     db: DatabaseConfig
 
 
-def get_str_env(key: str) -> str:
-    value = os.getenv(key)
-    if not value:
-        raise ConfigParseError(f"{key} must be set")
+def _get_path_config() -> str:
+    if not (value := os.getenv("BASE_CONFIG")):
+        raise ConfigParseError("Not found path to config.toml")
     return value
 
 
-def _load_database_config() -> DatabaseConfig:
-    return DatabaseConfig(db_url=os.getenv("DATABASE_URL"))
+def _get_data(path: str) -> dict[str, Any]:
+    with open(path, mode="rb") as file:
+        return tomllib.load(file)
 
 
 def load_config() -> ApplicationConfig:
+    path_config = _get_path_config()
+    data = _get_data(path_config)
     return ApplicationConfig(
-        debug=True if get_str_env("DEBUG") in ("true", "True") else False,
-        db=_load_database_config(),
+        **data.get("application"),
+        db=DatabaseConfig(**data.get("database"))
     )
