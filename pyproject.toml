@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=66.0"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.9.17,<0.10.0"]
+build-backend = "uv_build"
 
 [project]
 name = "app"
@@ -17,8 +17,9 @@ dependencies = [
     "sqlalchemy<=2.0.31",
     "uvicorn<=0.30.5",
     "alembic<=1.13.2",
-    "asyncpg<=0.29.0",
     "pydantic<=2.8.2",
+    "psycopg[binary,pool]<=3.3.2",
+    "sniffio>=1.3.1"
 ]
 
 [project.optional-dependencies]
