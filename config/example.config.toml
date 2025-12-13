@@ -1,0 +1,5 @@
+[database]
+url = "postgresql+asyncpg://postgres:password@localhost:5432/task"
+
+[application]
+debug = true
