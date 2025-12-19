@@ -9,9 +9,9 @@ from litestar.openapi.spec import (
     OpenAPIType,
 )
 
-from app.presentation.openapi.exceptions.task import TASK_NOT_FOUND_EXCEPTION
-from app.presentation.openapi.parameter.base import BaseParameterSchema
-from app.presentation.openapi.parameter.task import TaskParameterSchema
+from app.adapter.presentation.openapi.exceptions.task import TASK_NOT_FOUND_EXCEPTION
+from app.adapter.presentation.openapi.parameter.base import BaseParameterSchema
+from app.adapter.presentation.openapi.parameter.task import TaskParameterSchema
 
 DESCRIPTION = """
 Get task.

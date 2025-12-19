@@ -9,9 +9,9 @@ from litestar.openapi.spec import (
     OpenAPIType,
 )
 
-from app.presentation.constants import LIMIT, OFFSET, TOTAL
-from app.presentation.openapi.parameter.base import BaseParameterSchema
-from app.presentation.openapi.parameter.task import TaskParameterSchema
+from app.adapter.presentation.constants import LIMIT, OFFSET, TOTAL
+from app.adapter.presentation.openapi.parameter.base import BaseParameterSchema
+from app.adapter.presentation.openapi.parameter.task import TaskParameterSchema
 
 DESCRIPTION = """
 Get tasks.

@@ -8,8 +8,8 @@ from app.application.model.task import (
     CreateTaskView,
     UpdateTaskView,
 )
-from app.presentation.constants import TOTAL, LIMIT, OFFSET
-from app.presentation.model.base import Base
+from app.adapter.presentation.constants import TOTAL, LIMIT, OFFSET
+from app.adapter.presentation.model.base import Base
 
 
 class JsonTask(Base):

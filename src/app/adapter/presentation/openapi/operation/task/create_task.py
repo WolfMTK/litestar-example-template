@@ -9,7 +9,7 @@ from litestar.openapi.spec import (
     OpenAPIType,
 )
 
-from app.presentation.openapi.parameter.task import TaskParameterSchema
+from app.adapter.presentation.openapi.parameter.task import TaskParameterSchema
 
 DESCRIPTION = """
 Create task.

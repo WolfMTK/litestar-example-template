@@ -5,16 +5,16 @@ from litestar.controller import Controller
 from litestar.params import Dependency, Parameter
 
 from app.application.exceptions.task import TaskNotFoundException
-from app.presentation.constants import OFFSET, LIMIT
-from app.presentation.exception_handlers import not_found
-from app.presentation.interactor import InteractorFactory
-from app.presentation.model.task import (
+from app.adapter.presentation.constants import OFFSET, LIMIT
+from app.adapter.presentation.exception_handlers import not_found
+from app.adapter.presentation.interactor import InteractorFactory
+from app.adapter.presentation.model.task import (
     JsonCreateTask,
     JsonTask,
     JsonTaskList,
     JsonUpdateTask,
 )
-from app.presentation.openapi import (
+from app.adapter.presentation.openapi import (
     CreateTaskOperation,
     GetTaskOperation,
     GetTasksOperation,
