@@ -10,7 +10,7 @@ from app.adapter.db.model import BaseModel
 from app.config import load_config
 
 config = context.config
-config.set_main_option("sqlalchemy.url", load_config().db.db_url)
+config.set_main_option("sqlalchemy.url", load_config().db.url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
