@@ -48,11 +48,11 @@ version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },
+    { name = "greenlet" },
     { name = "litestar" },
     { name = "psycopg", extra = ["binary", "pool"] },
     { name = "pydantic" },
     { name = "python-ulid" },
-    { name = "sniffio" },
     { name = "sqlalchemy" },
     { name = "uvicorn" },
 ]
@@ -65,16 +65,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "alembic", specifier = "<=1.13.2" },
-    { name = "litestar", specifier = "<=2.10.0" },
+    { name = "alembic", specifier = "<=1.17.2" },
+    { name = "greenlet", specifier = ">=3.3.0" },
+    { name = "litestar", specifier = "<=2.19.0" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = "<=3.3.2" },
-    { name = "pydantic", specifier = "<=2.8.2" },
+    { name = "pydantic", specifier = "<=2.12.5" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "<=8.2.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = "<=0.23.6" },
-    { name = "python-ulid", specifier = "<=2.7.0" },
-    { name = "sniffio", specifier = ">=1.3.1" },
-    { name = "sqlalchemy", specifier = "<=2.0.31" },
-    { name = "uvicorn", specifier = "<=0.30.5" },
+    { name = "python-ulid", specifier = "<=3.1.0" },
+    { name = "sqlalchemy", specifier = "<=2.0.45" },
+    { name = "uvicorn", specifier = "<=0.38.0" },
 ]
 provides-extras = ["dev"]
 
@@ -739,15 +739,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/bf/d8/f2c1b7e9a645ba40f756d7a5b195fc104729bc6b19061ba3ab385f342931/rich_click-1.9.4.tar.gz", hash = "sha256:af73dc68e85f3bebb80ce302a642b9fe3b65f3df0ceb42eb9a27c467c1b678c8", size = 73632, upload-time = "2025-10-25T01:08:49.142Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5b/6a/1f03adcb3cc7beb6f63aecc21565e9d515ccee653187fc4619cd0b42713b/rich_click-1.9.4-py3-none-any.whl", hash = "sha256:d70f39938bcecaf5543e8750828cbea94ef51853f7d0e174cda1e10543767389", size = 70245, upload-time = "2025-10-25T01:08:47.939Z" },
-]
-
-[[package]]
-name = "sniffio"
-version = "1.3.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a2/87/a6771e1546d97e7e041b6ae58d80074f81b7d5121207425c964ddf5cfdbd/sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc", size = 20372, upload-time = "2024-02-25T23:20:04.057Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e9/44/75a9c9421471a6c4805dbf2356f7c181a29c1879239abab1ea2cc8f38b40/sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2", size = 10235, upload-time = "2024-02-25T23:20:01.196Z" },
 ]
 
 [[package]]
