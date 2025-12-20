@@ -1,102 +1,156 @@
-from collections.abc import Iterator
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from sqlalchemy import insert, update, case, select, func, delete
-
-from app.adapter.db.gateway.base import BaseGateway
-from app.adapter.db.model import Tasks
 from app.domain.model.id import Id
-from app.domain.model.task import Task
+from app.domain.model.task import Task, TaskList
 
 
-class TaskGateway(BaseGateway[Task]):
-    async def insert(self, source: Task) -> Task:
-        stmt = (
-            insert(Tasks)
-            .values(
-                id=source.id,
-                name=source.name,
-                description=source.description
-            )
-            .returning(Tasks)
+class TaskGateway:
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def insert(self, task: Task) -> Task:
+        query = text(
+            """
+            INSERT INTO 
+                tasks (id, name, description)
+            VALUES 
+                (:id, :name, :description) 
+            RETURNING
+                    id, name, description
+            """
         )
-        result = await self.session.execute(stmt)
-        return result.scalar_one().into()
-
-    async def update(self, source: Task) -> Task:
-        stmt = (
-            update(Tasks)
-            .where(
-                Tasks.id == source.id
-            )
-            .values(
-                name=case(
-                    (source.name is not None, source.name),
-                    else_=Tasks.name
-                ),
-                description=case(
-                    (source.description is not None, source.description),
-                    else_=Tasks.description
-                )
-            )
-            .returning(Tasks)
+        result = await self.session.execute(
+            statement=query,
+            params={
+                "id": str(task.id),
+                "name": task.name,
+                "description": task.description,
+            }
         )
-        result = await self.session.execute(stmt)
-        return result.scalar().into()
-
-    async def get(self, source: Id) -> Task | None:
-        stmt = (
-            select(Tasks)
-            .where(
-                Tasks.id == source
-            )
+        row = result.fetchone()
+        return Task(
+            id=row.id,
+            name=row.name,
+            description=row.description,
         )
-        result = await self.session.execute(stmt)
 
-        model = result.scalar_one_or_none()
-        if model is not None:
-            return model.into()
-        return model
-
-    async def get_list(
-            self,
-            limit: int,
-            offset: int
-    ) -> Iterator[Task]:
-        stmt = (
-            select(Tasks)
-            .limit(limit)
-            .offset(offset)
+    async def get(self, task_id: Id) -> Task | None:
+        query = text(
+            """
+            SELECT 
+                t.id, t.name, t.description
+            FROM 
+                tasks t
+            WHERE 
+                t.id = :id
+            """
         )
-        result = await self.session.execute(stmt)
-        return (task.into() for task in result.scalars())
-
-    async def get_total(self) -> int:
-        stmt = (
-            select(
-                func.count(
-                    Tasks.id
-                )
-            )
+        result = await self.session.execute(
+            statement=query,
+            params={
+                "id": str(task_id),
+            }
         )
-        result = await self.session.scalar(stmt)
-        return result
-
-    async def check_task(self, source: Id) -> bool:
-        stmt = select(
-            select(Tasks)
-            .where(
-                Tasks.id == source
-            )
-            .exists()
+        row = result.fetchone()
+        if not row:
+            return None
+        return Task(
+            id=row.id,
+            name=row.name,
+            description=row.description,
         )
-        result = await self.session.scalar(stmt)
-        return result
 
-    async def delete(self, source: Id) -> Task:
-        stmt = (
-            delete(Tasks)
-            .where(Tasks.id == source)
-            .returning(Tasks)
+    async def get_list(self, limit: int, offset: int) -> TaskList:
+        query = text(
+            """
+            SELECT 
+                t.id, t.name, t.description
+            FROM 
+                tasks t
+            ORDER BY 
+                t.id 
+            LIMIT
+                :limit
+            OFFSET 
+                :offset
+            """
         )
-        result = await self.session.execute(stmt)
-        return result.scalar().into()
+        result = await self.session.execute(
+            statement=query,
+            params={
+                "limit": limit,
+                "offset": limit * offset,
+            }
+        )
+        rows = result.fetchall()
+        return TaskList(
+            limit=limit,
+            offset=offset,
+            total=await self._get_total(),
+            values=[Task(
+                id=row.id,
+                name=row.name,
+                description=row.description,
+            ) for row in rows]
+        )
+
+    async def update(self, task: Task) -> Task:
+        query = text(
+            """
+            UPDATE
+                tasks t
+            SET 
+                name = :name,
+                description = :description
+            WHERE 
+                t.id = :id 
+            RETURNING
+                t.id, t.name, t.description
+            """
+        )
+        result = await self.session.execute(
+            statement=query,
+            params={
+                "id": str(task.id),
+                "name": task.name,
+                "description": task.description,
+            }
+        )
+        row = result.fetchone()
+        return Task(
+            id=row.id,
+            name=row.name,
+            description=row.description,
+        )
+
+    async def delete(self, task_id: Id) -> None:
+        query = text(
+            """
+            DELETE FROM
+                tasks t
+            WHERE
+                 t.id = :id
+            """
+        )
+        await self.session.execute(
+            statement=query,
+            params={
+                "id": str(task_id),
+            }
+        )
+
+    async def _get_total(self) -> int:
+        query = text(
+            """
+            SELECT 
+                COUNT(t.id) total
+            FROM 
+                tasks t
+            """
+        )
+        result = await self.session.execute(
+            statement=query,
+        )
+        row = result.fetchone()
+        return row.total
