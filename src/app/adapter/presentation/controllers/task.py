@@ -1,13 +1,12 @@
 from typing import Annotated
 
-from litestar import post, get, delete, patch, status_codes
+from dishka.integrations.litestar import inject, FromDishka
+from litestar import post, get, patch, delete, status_codes
 from litestar.controller import Controller
-from litestar.params import Dependency, Parameter
+from litestar.params import Parameter
 
-from app.application.exceptions.task import TaskNotFoundException
 from app.adapter.presentation.constants import OFFSET, LIMIT
 from app.adapter.presentation.exception_handlers import not_found
-from app.adapter.presentation.interactor import InteractorFactory
 from app.adapter.presentation.model.task import (
     JsonCreateTask,
     JsonTask,
@@ -21,6 +20,17 @@ from app.adapter.presentation.openapi import (
     UpdateTaskOperation,
     DeleteTaskOperation,
 )
+from app.application.dto.id import IdDTO
+from app.application.dto.page import PaginationDTO
+from app.application.dto.task import CreateTaskDTO, UpdateTaskDTO
+from app.application.exceptions.task import TaskNotFoundException
+from app.application.interactor.task import (
+    RegisterTaskInteractor,
+    GetTaskInteractor,
+    GetTaskListInteractor,
+    UpdateTaskInteractor,
+    DeleteTaskInteractor,
+)
 
 LENGTH_ID = 26
 
@@ -28,63 +38,81 @@ LENGTH_ID = 26
 class TaskController(Controller):
     path = "/tasks"
     exception_handlers = {
-        TaskNotFoundException: not_found
+        TaskNotFoundException: not_found,
     }
 
     @post(
-        operation_class=CreateTaskOperation
+        operation_class=CreateTaskOperation,
     )
+    @inject
     async def create_task(
             self,
             data: JsonCreateTask,
-            ioc: Annotated[
-                InteractorFactory,
-                Dependency(skip_validation=True)
-            ]
+            interactor: FromDishka[RegisterTaskInteractor],
     ) -> JsonTask:
-        async with ioc.task_usecase() as usecase:
-            task = await usecase.create_task(data.into())
-            return JsonTask.from_into(task)
+        dto = CreateTaskDTO(
+            name=data.name,
+            description=data.description,
+        )
+        task = await interactor.execute(dto)
+        return JsonTask(
+            id=task.id,
+            name=task.name,
+            description=task.description,
+        )
 
     @get(
         "/{task_id:str}",
-        operation_class=GetTaskOperation
+        operation_class=GetTaskOperation,
     )
+    @inject
     async def get_task(
             self,
             task_id: Annotated[str, Parameter(
                 max_length=LENGTH_ID,
                 min_length=LENGTH_ID
             )],
-            ioc: Annotated[
-                InteractorFactory,
-                Dependency(skip_validation=True)
-            ]
+            interactor: FromDishka[GetTaskInteractor],
     ) -> JsonTask:
-        async with ioc.task_usecase() as usecase:
-            task = await usecase.get_task(task_id)
-            return JsonTask.from_into(task)
+        dto = IdDTO(id=task_id)
+        task = await interactor.execute(dto)
+        return JsonTask(
+            id=task.id,
+            name=task.name,
+            description=task.description,
+        )
 
     @get(
-        operation_class=GetTasksOperation
+        operation_class=GetTasksOperation,
     )
+    @inject
     async def get_tasks(
             self,
-            ioc: Annotated[
-                InteractorFactory,
-                Dependency(skip_validation=True)
-            ],
+            interactor: FromDishka[GetTaskListInteractor],
             limit: int = LIMIT,
-            offset: int = OFFSET
+            offset: int = OFFSET,
     ) -> JsonTaskList:
-        async with ioc.task_usecase() as usecase:
-            tasks = await usecase.get_tasks(limit, offset)
-            return JsonTaskList.from_into(limit, offset, tasks)
+        dto = PaginationDTO(
+            limit=limit,
+            offset=offset,
+        )
+        tasks = await interactor.execute(dto)
+        return JsonTaskList(
+            limit=limit,
+            offset=offset,
+            total=tasks.total,
+            values=[JsonTask(
+                id=task.id,
+                name=task.name,
+                description=task.description,
+            ) for task in tasks.values]
+        )
 
     @patch(
         "/{task_id:str}",
-        operation_class=UpdateTaskOperation
+        operation_class=UpdateTaskOperation,
     )
+    @inject
     async def update_task(
             self,
             task_id: Annotated[str, Parameter(
@@ -92,30 +120,33 @@ class TaskController(Controller):
                 min_length=LENGTH_ID
             )],
             data: JsonUpdateTask,
-            ioc: Annotated[
-                InteractorFactory,
-                Dependency(skip_validation=True)
-            ]
+            interactor: FromDishka[UpdateTaskInteractor],
     ) -> JsonTask:
-        async with ioc.task_usecase() as usecase:
-            task = await usecase.update_task(data.into(task_id))
-            return JsonTask.from_into(task)
+        dto = UpdateTaskDTO(
+            id=task_id,
+            name=data.name,
+            description=data.description,
+        )
+        task = await interactor.execute(dto)
+        return JsonTask(
+            id=task.id,
+            name=task.name,
+            description=task.description,
+        )
 
     @delete(
         "/{task_id:str}",
         status_code=status_codes.HTTP_204_NO_CONTENT,
-        operation_class=DeleteTaskOperation
+        operation_class=DeleteTaskOperation,
     )
+    @inject
     async def delete_task(
             self,
             task_id: Annotated[str, Parameter(
                 max_length=LENGTH_ID,
                 min_length=LENGTH_ID
             )],
-            ioc: Annotated[
-                InteractorFactory,
-                Dependency(skip_validation=True)
-            ]
+            interactor: FromDishka[DeleteTaskInteractor],
     ) -> None:
-        async with ioc.task_usecase() as usecase:
-            await usecase.delete_task(task_id)
+        dto = IdDTO(id=task_id)
+        await interactor.execute(dto)
