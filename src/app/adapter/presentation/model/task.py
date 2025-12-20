@@ -1,13 +1,5 @@
-from typing import Self
-
 from pydantic import Field
 
-from app.application.model.task import (
-    TaskView,
-    TaskListView,
-    CreateTaskView,
-    UpdateTaskView,
-)
 from app.adapter.presentation.constants import TOTAL, LIMIT, OFFSET
 from app.adapter.presentation.model.base import Base
 
@@ -37,14 +29,6 @@ class JsonTask(Base):
             "example": "Make a meal"
         }
     )
-
-    @classmethod
-    def from_into(cls, value: TaskView) -> Self:
-        return cls(
-            id=value.id,
-            name=value.name,
-            description=value.description
-        )
 
 
 class JsonTaskList(Base):
@@ -77,15 +61,6 @@ class JsonTaskList(Base):
         description="Tasks"
     )
 
-    @classmethod
-    def from_into(cls, limit: int, offset: int, value: TaskListView) -> Self:
-        return cls(
-            total=value.total,
-            limit=limit,
-            offset=offset,
-            values=[JsonTask.from_into(task) for task in value.tasks]
-        )
-
 
 class JsonCreateTask(Base):
     name: str = Field(
@@ -105,12 +80,6 @@ class JsonCreateTask(Base):
         }
     )
 
-    def into(self) -> CreateTaskView:
-        return CreateTaskView(
-            name=self.name,
-            description=self.description
-        )
-
 
 class JsonUpdateTask(Base):
     name: str | None = Field(
@@ -127,10 +96,3 @@ class JsonUpdateTask(Base):
             "description": "Task Description",
         }
     )
-
-    def into(self, task_id: str) -> UpdateTaskView:
-        return UpdateTaskView(
-            id=task_id,
-            name=self.name,
-            description=self.description
-        )

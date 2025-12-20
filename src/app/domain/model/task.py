@@ -8,3 +8,11 @@ class Task:
     id: Id
     name: str | None
     description: str | None
+
+
+@dataclass(slots=True)
+class TaskList:
+    total: int
+    limit: int
+    offset: int
+    values: list[Task]
