@@ -1,11 +1,39 @@
 from collections.abc import Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Self, cast
 
 from ulid import ULID
 
 from app.domain.model.id import Id
 from app.domain.model.task import Task
+
+
+@dataclass(slots=True)
+class CreateTaskDTO:
+    name: str
+    description: str
+
+
+@dataclass(slots=True)
+class TaskDTO:
+    id: str
+    name: str
+    description: str
+
+
+@dataclass(slots=True)
+class TaskListDTO:
+    total: int
+    limit: int
+    offset: int
+    values: list[TaskDTO]
+
+
+@dataclass(slots=True, kw_only=True)
+class UpdateTaskDTO:
+    id: str
+    name: str | None = field(default=None)
+    description: str | None = field(default=None)
 
 
 @dataclass(slots=True)
