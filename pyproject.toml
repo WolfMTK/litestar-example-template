@@ -20,13 +20,14 @@ dependencies = [
     "pydantic<=2.12.5",
     "psycopg[binary,pool]<=3.3.2",
     "greenlet<=3.3.0",
-    "dishka>=1.7.2",
+    "dishka<=1.7.2",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest<=8.2.0",
     "pytest-asyncio<=0.23.6",
+    "faker<=39.0.0",
 ]
 
 [tool.pytest.ini_options]
