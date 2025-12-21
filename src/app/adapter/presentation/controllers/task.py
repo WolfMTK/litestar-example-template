@@ -7,6 +7,7 @@ from litestar.params import Parameter
 
 from app.adapter.presentation.constants import OFFSET, LIMIT
 from app.adapter.presentation.exception_handlers import not_found
+from app.adapter.presentation.model.id import JsonId
 from app.adapter.presentation.model.task import (
     JsonCreateTask,
     JsonTask,
@@ -49,16 +50,14 @@ class TaskController(Controller):
             self,
             data: JsonCreateTask,
             interactor: FromDishka[RegisterTaskInteractor],
-    ) -> JsonTask:
+    ) -> JsonId:
         dto = CreateTaskDTO(
             name=data.name,
             description=data.description,
         )
-        task = await interactor.execute(dto)
-        return JsonTask(
-            id=task.id,
-            name=task.name,
-            description=task.description,
+        task_id = await interactor.execute(dto)
+        return JsonId(
+            id=task_id.id,
         )
 
     @get(
