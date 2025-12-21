@@ -26,7 +26,7 @@ class RegisterTaskInteractor:
         self.task_write = task_write
         self.ulid_generator = ulid_generator
 
-    async def execute(self, source: CreateTaskDTO) -> TaskDTO:
+    async def execute(self, source: CreateTaskDTO) -> IdDTO:
         task = Task(
             id=self.ulid_generator(),
             name=source.name,
@@ -34,10 +34,8 @@ class RegisterTaskInteractor:
         )
         task = await self.task_write.insert(task)
         await self.db_session.commit()
-        return TaskDTO(
+        return IdDTO(
             id=task.id,
-            name=task.name,
-            description=task.description,
         )
 
 
@@ -125,5 +123,5 @@ class DeleteTaskInteractor:
         task = await self.task_read.get(dto.id)
         if task is None:
             raise TaskNotFoundException()
-        await self.task_write.delete(task.id)
+        await self.task_write.delete(dto.id)
         await self.db_session.commit()
