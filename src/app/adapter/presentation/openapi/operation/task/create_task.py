@@ -63,8 +63,6 @@ class CreateTaskOperation(Operation):
                             type=OpenAPIType.OBJECT,
                             properties={
                                 "id": TaskParameterSchema.id,
-                                "name": TaskParameterSchema.name,
-                                "description": TaskParameterSchema.description
                             }
                         ),
                         example=RESPONSE_EXAMPLE
