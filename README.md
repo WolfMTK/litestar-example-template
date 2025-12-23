@@ -20,4 +20,4 @@ improved.
 
 ## Run
 
-`uv run uvicorn --factory app.main:create_app`
+`uv run uvicorn --factory app.main:get_app`
